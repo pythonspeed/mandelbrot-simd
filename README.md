@@ -34,38 +34,17 @@ The resulting image is piped to `stdout`.
 
 ## Performance
 
+Make sure you have `hyperfine` installed.
+
+Multi-threaded:
 ```
-./benchmark.sh
+$ ./benchmark.sh
 ```
 
-On a dual core AVX1 i5 @1.8 GHz:
+Single-threaded:
 
-| 800 x 800  | time [ms] <br> Rust | speedup vs `scalar` [-] |
-|------------|---------------------|-------------|
-| `scalar`   | 86.6                | 1.0x        |
-| `simd`     | 21.0                | 4.1x        |
-| `ispc`     | 25.7                | 3.4x        |
-
-`simd` algorithm is ~1.2x faster than `ispc`.
-
-On a 28 core Xeon CPU E5-2690 v4 @ 2.60GHz:
-
-| 800 x 800  | time [ms] <br> Rust | speedup vs `scalar` [-] |
-|------------|---------------------|-------------------------|
-| `scalar`   | 50.8                | 1.0x                    |
-| `simd`     | 25.1                | 2x                      |
-| `ispc`     | 14.4                | 3.52x                   |
-
-`simd` algorithm is ~1.74x slower than `ispc`.
-
-On a 40 core Xeon Gold 6148 CPU @ 2.40GHz:
-
-| 800 x 800  | time [ms] <br> Rust | speedup vs `scalar` [-] |
-|------------|---------------------|-------------|
-| `scalar`   | 59.9                | 1.0x        |
-| `simd`     | 29.9                | 2.0x        |
-| `ispc`     | 30.3                | 2.0x        |
-
-`simd` algorithm is as fast as `ispc`.
+```
+$ RAYON_NUM_THREADS=1 ./benchmark.sh
+```
 
 [bg]: https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/mandelbrot.html#mandelbrot
