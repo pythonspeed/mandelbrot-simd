@@ -2,15 +2,7 @@
 //!
 //! [bg]: https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/mandelbrot.html#mandelbrot
 
-// FIXME: Null pointer deref warning triggered in this example,
-// likely inside a macro expansion deriving from packed_simd.
-#![deny(rust_2018_idioms)]
-#![allow(
-    clippy::cast_precision_loss,
-    clippy::cast_sign_loss,
-    clippy::cast_possible_truncation,
-    clippy::must_use_candidate
-)]
+#![feature(portable_simd)]
 
 use rayon::prelude::*;
 use std::{io, ops};

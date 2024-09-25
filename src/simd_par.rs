@@ -2,12 +2,12 @@
 #![allow(non_camel_case_types)]
 
 use crate::*;
-use packed_simd::*;
+use std::simd::prelude::*;
 
 type u64s = u64x8;
 type u32s = u32x8;
 type f64s = f64x8;
-type m64s = m64x8;
+type mask64s = mask64x8;
 
 /// Storage for complex numbers in SIMD format.
 /// The real and imaginary parts are kept in separate registers.
@@ -21,14 +21,14 @@ impl Complex {
     /// Returns a mask describing which members of the Mandelbrot sequence
     /// haven't diverged yet
     #[inline]
-    fn undiverged(&self) -> m64s {
+    fn undiverged(&self) -> mask64s {
         let Self { real: x, imag: y } = *self;
 
         let xx = x * x;
         let yy = y * y;
         let sum = xx + yy;
 
-        sum.le(f64s::splat(THRESHOLD))
+        sum.simd_le(f64s::splat(THRESHOLD))
     }
 }
 
@@ -64,7 +64,7 @@ impl MandelbrotIter {
             // this check every iteration, since a branch
             // misprediction can hurt more than doing some extra
             // calculations.
-            if undiverged.none() {
+            if !undiverged.any() {
                 break;
             }
 
@@ -101,7 +101,7 @@ impl Iterator for MandelbrotIter {
 pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
     let (width, height) = dims;
 
-    let block_size = f64s::lanes();
+    let block_size = f64s::LEN;
 
     assert_eq!(
         width % block_size,

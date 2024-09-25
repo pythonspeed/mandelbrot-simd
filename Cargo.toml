@@ -6,7 +6,6 @@ build = "build.rs"
 edition = "2018"
 
 [dependencies]
-packed_simd = { package = "packed_simd", path = "../.." }
 rayon = "^1.0"
 ispc = { version = "^1.0.4", optional = true }
 structopt = { version = "0.3.0", features = ["color"] }
@@ -24,5 +23,3 @@ path = "src/lib.rs"
 
 [features]
 default = []
-sleef-sys = ["packed_simd/sleef-sys"]
-core_arch = ["packed_simd/core_arch"]
