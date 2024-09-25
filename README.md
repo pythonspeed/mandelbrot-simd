@@ -1,8 +1,8 @@
 # Mandelbrot
 
-This is based on the [`mandelbrot` benchmark from the benchmarksgame][bg], as implemented in the defunct `packed_simd` project, and soon-to-be-updated for Rust portable SIMD (nightly only at the moment).
+This is based on the [`mandelbrot` benchmark from the benchmarksgame][bg], as implemented in the since-superseded `packed_simd` project, and updated for [Rust portable SIMD](https://doc.rust-lang.org/std/simd/index.html) (nightly only at the moment).
 
-Licensed under MIT or Apache 2.0, at your choice, copyrighted by the Rust Project Developers and (for the port to portable SIMD parts) Itamar Turner-Trauring.
+Licensed under MIT or Apache 2.0, at your choice, copyrighted by the Rust Project Developers, with minor changes by Itamar Turner-Trauring.
 
 ## Background
 
