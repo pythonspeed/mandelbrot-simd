@@ -1,0 +1,28 @@
+[package]
+name = "mandelbrot"
+version = "0.1.0"
+authors = ["gnzlbg <gonzalobg88@gmail.com>"]
+build = "build.rs"
+edition = "2018"
+
+[dependencies]
+packed_simd = { package = "packed_simd", path = "../.." }
+rayon = "^1.0"
+ispc = { version = "^1.0.4", optional = true }
+structopt = { version = "0.3.0", features = ["color"] }
+
+[build-dependencies]
+ispc = { version = "^1.0.4", optional = true }
+
+[[bin]]
+name = "mandelbrot"
+path = "src/main.rs"
+
+[lib]
+name = "mandelbrot_lib"
+path = "src/lib.rs"
+
+[features]
+default = []
+sleef-sys = ["packed_simd/sleef-sys"]
+core_arch = ["packed_simd/core_arch"]
