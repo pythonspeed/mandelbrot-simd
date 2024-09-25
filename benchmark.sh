@@ -4,8 +4,8 @@
 
 set -ex
 
-WIDTH=800
-HEIGHT=800
+WIDTH=3200
+HEIGHT=3200
 
 if [[ ${NORUN} != 1 ]]; then
     hash hyperfine 2>/dev/null || { echo >&2 "hyperfine is not in PATH."; exit 1; }
@@ -27,8 +27,8 @@ if [[ "${NORUN}" == "1" ]]; then
     exit 0
 fi
 
-hyperfine "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo scalar"
-hyperfine "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo simd"
+hyperfine --warmup 1 "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo scalar"
+hyperfine --warmup 1 "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo simd"
 
 if echo "$FEATURES" | grep -q "ispc"; then
     hyperfine "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo ispc"
