@@ -4,13 +4,18 @@
 use crate::*;
 use std::simd::prelude::*;
 
+// Instead of storing a single value, we store a vector of 8 values; each index
+// in the vector, from 0 to 7, is a different "lane". Because they're special
+// SIMD types, they'll get processed as a batch if the CPU supports it, using
+// special SIMD "registers" (CPU storage slots), which can be 128-bit, 256-bit,
+// or 512-bit.
 type u64s = u64x8;
 type u32s = u32x8;
 type f64s = f64x8;
 
-/// Storage for complex numbers in SIMD format.
-/// The real and imaginary parts are kept in separate registers.
-#[derive(Copy, Clone)]
+/// Storage for complex numbers in SIMD format. The real and imaginary parts are
+/// kept in separate registers.
+#[derive(Clone)]
 struct Complex {
     real: f64s,
     imag: f64s,
@@ -19,16 +24,32 @@ struct Complex {
 /// Returns the number of iterations it takes for the Mandelbrot sequence
 /// to diverge at this point, or `ITER_LIMIT` if it doesn't diverge.
 fn get_count(start: &Complex) -> u32s {
+    // Instead of getting a single value as input, we get a batch of 8.
     let mut current = start.clone();
+    // Instead of having a single return value, we are going to return a batch
+    // of 8 values. We initialize all of them to 0.
     let mut count = u64s::splat(0);
+    // This is the threshold we will compare our current 8 values to, turned
+    // into an SIMD vector of 8 values.
     let threshold_mask = f64s::splat(THRESHOLD);
 
     for _ in 0..ITER_LIMIT {
+        // This looks just like the scalar operations, but we're multiplying 8
+        // values against 8 values. Hopefully our CPU has the instructions that
+        // less do all of these multiplications at once!
         let rr = current.real * current.real;
         let ii = current.imag * current.imag;
 
         // Keep track of those lanes which haven't diverged yet. The other ones
         // will be masked off.
+        //
+        // For example:
+        //
+        // [2.3, 4.2, 4.0, 4.1, 0.5, 0.7, 2.3, 5.0]
+        //                 simd_le
+        // [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+        //                    ↓
+        // [  1,   0,   1,   0,   1,   1,   1,   0]
         let undiverged_mask = (rr + ii).simd_le(threshold_mask);
 
         // Stop the iteration if they all diverged.
@@ -39,6 +60,8 @@ fn get_count(start: &Complex) -> u32s {
         // For undiverged lanes add 1, for diverged lanes add 0.
         count += undiverged_mask.select(u64s::splat(1), u64s::splat(0));
 
+        // Same calculation as scalar algorithm, but hopefully doing 8
+        // operations in a single SIMD CPU instruction.
         let ri = current.real * current.imag;
 
         current.real = start.real + (rr - ii);
