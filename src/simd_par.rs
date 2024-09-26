@@ -36,6 +36,7 @@ fn get_count(start: &Complex) -> u32s {
             break;
         }
 
+        // For undiverged lanes add 1, for diverged lanes add 0.
         count += undiverged_mask.select(u64s::splat(1), u64s::splat(0));
 
         let ri = current.real * current.imag;
