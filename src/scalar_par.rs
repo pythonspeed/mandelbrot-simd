@@ -15,8 +15,8 @@ struct Complex {
 fn get_count(start: Complex) -> u32 {
     let mut current = start.clone();
     for iteration in 0..ITER_LIMIT {
-        let rr = current.real.powi(2);
-        let ii = current.imag.powi(2);
+        let rr = current.real * current.real;
+        let ii = current.imag * current.imag;
         if rr + ii > THRESHOLD {
             return iteration;
         }
