@@ -46,7 +46,6 @@ fn get_count(start: &Complex) -> u32s {
     count.cast()
 }
 
-
 pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
     let (width, height) = dims;
 
@@ -85,14 +84,16 @@ pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
         out.set_len(len);
     }
 
-    out.par_chunks_mut(width_in_blocks).enumerate().for_each(|(i, row)| {
-        let y = f64s::splat(yr.start + dy * (i as f64));
-        row.iter_mut().enumerate().for_each(|(j, count)| {
-            let x = xs[j];
-            let z = Complex { real: x, imag: y };
-            *count = get_count(&z);
+    out.par_chunks_mut(width_in_blocks)
+        .enumerate()
+        .for_each(|(i, row)| {
+            let y = f64s::splat(yr.start + dy * (i as f64));
+            row.iter_mut().enumerate().for_each(|(j, count)| {
+                let x = xs[j];
+                let z = Complex { real: x, imag: y };
+                *count = get_count(&z);
+            });
         });
-    });
 
     // This is safe, we're transmuting from a more-aligned type to a
     // less-aligned one.
