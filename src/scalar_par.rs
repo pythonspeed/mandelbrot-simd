@@ -10,19 +10,14 @@ struct Complex {
     imag: f64,
 }
 
-impl Complex {
-    /// Returns true if this member of the Mandelbrot sequence is diverging
-    #[inline]
-    fn diverged(&self) -> bool {
-        let Self { real: x, imag: y } = self;
+#[inline]
+fn diverged(c: Complex) -> bool {
+    let rr = c.real * c.real;
+    let ii = c.imag * c.imag;
 
-        let xx = x * x;
-        let yy = y * y;
-        let sum = xx + yy;
-
-        sum > THRESHOLD
-    }
+    rr + ii > THRESHOLD
 }
+
 
 /// An iterator yielding the infinite Mandelbrot sequence
 struct MandelbrotIter {
@@ -43,7 +38,7 @@ impl MandelbrotIter {
     fn count(mut self) -> u32 {
         let mut z = self.start;
         for i in 0..ITER_LIMIT {
-            if z.diverged() {
+            if diverged(z) {
                 return i;
             }
 
