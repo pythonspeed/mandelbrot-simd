@@ -1,6 +1,11 @@
 # Mandelbrot
 
-This is based on the [`mandelbrot` benchmark from the benchmarksgame][bg], as implemented in the since-superseded `packed_simd` project, and updated for [Rust portable SIMD](https://doc.rust-lang.org/std/simd/index.html) (nightly only at the moment).
+This is based on the [`mandelbrot` benchmark from the benchmarksgame][bg], as implemented in the since-superseded [`packed_simd` project](https://github.com/rust-lang/packed_simd/tree/master/examples/mandelbrot).
+
+Changes from the original implementation:
+
+* Updated to use the newer [Rust portable SIMD API](https://doc.rust-lang.org/std/simd/index.html) (nightly only at the moment).
+* Simplified the calculation logic so it's easier to understand.
 
 Licensed under MIT or Apache 2.0, at your choice, copyrighted by the Rust Project Developers, with minor changes by Itamar Turner-Trauring.
 
