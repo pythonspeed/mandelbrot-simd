@@ -27,7 +27,7 @@ struct Opt {
     algo: String,
 }
 
-const ALGORITHMS: &[&str] = &["scalar", "simd", "ispc"];
+const ALGORITHMS: &[&str] = &["scalar", "simd", "compiler-simd","ispc"];
 
 fn main() {
     let opt = Opt::from_args();
@@ -35,6 +35,7 @@ fn main() {
     let algo = match opt.algo.as_str() {
         "scalar" => Algorithm::Scalar,
         "simd" => Algorithm::Simd,
+        "compiler-simd" => Algorithm::CompilerSimd,
         "ispc" => Algorithm::Ispc,
         algo => panic!(
             "Unknown algorithm: {:?}\nAvailable algorithms: {:?}",
