@@ -23,6 +23,7 @@ mod scalar_par;
 mod simd_par;
 
 mod compiler_simd_par;
+mod compiler_simd;
 
 type Range = ops::Range<f64>;
 type Region = (Range, Range);
@@ -73,6 +74,13 @@ impl Mandelbrot {
             ),
         };
 
+        Self { dims, data }
+    }
+
+    pub fn generate_region_cs(
+        dims: Dimensions, region: Region, algo: Algorithm,
+    ) -> Self {
+        let data=compiler_simd::generate(dims, region.0, region.1);
         Self { dims, data }
     }
 
