@@ -22,6 +22,9 @@ mod ispc_tasks;
 mod scalar_par;
 mod simd_par;
 
+mod autovectorization_par;
+mod autovectorization_ser;
+
 type Range = ops::Range<f64>;
 type Region = (Range, Range);
 
@@ -35,6 +38,8 @@ pub enum Algorithm {
     Scalar,
     /// Parallel SIMD algorithm using Rayon
     Simd,
+    /// Autovectorization
+    AutoVectorization,
     /// ISPC SIMD + parallel tasks algorithm
     Ispc,
 }
@@ -60,6 +65,7 @@ impl Mandelbrot {
                 scalar_par::generate(dims, region.0, region.1)
             }
             Algorithm::Simd => simd_par::generate(dims, region.0, region.1),
+            Algorithm::AutoVectorization => autovectorization_par::generate(dims, region.0, region.1),
             #[cfg(feature = "ispc")]
             Algorithm::Ispc => ispc_tasks::generate(dims, region.0, region.1),
             #[cfg(not(feature = "ispc"))]
