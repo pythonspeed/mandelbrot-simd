@@ -59,10 +59,7 @@ pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
     let dy = (yr.end - yr.start) / (height as f64);
 
     let len = width * height;
-    let mut out = Vec::with_capacity(len);
-    unsafe {
-        out.set_len(len);
-    }
+    let mut out = vec![0; len];
 
     out.par_chunks_mut(width).enumerate().for_each(|(i, row)| {
         let y = yr.start + dy * (i as f64);
