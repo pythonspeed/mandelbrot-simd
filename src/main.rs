@@ -36,6 +36,7 @@ fn main() {
         "scalar" => Algorithm::Scalar,
         "simd" => Algorithm::Simd,
         "autovect" => Algorithm::AutoVectorization,
+        "wide" => Algorithm::Wide,
         "ispc" => Algorithm::Ispc,
         algo => panic!(
             "Unknown algorithm: {:?}\nAvailable algorithms: {:?}",

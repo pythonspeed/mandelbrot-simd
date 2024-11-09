@@ -30,6 +30,7 @@ fi
 hyperfine --warmup 1 "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo scalar"
 hyperfine --warmup 1 "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo simd"
 hyperfine --warmup 1 "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo autovect"
+hyperfine --warmup 1 "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo wide"
 
 if echo "$FEATURES" | grep -q "ispc"; then
     hyperfine "target/release/mandelbrot ${WIDTH} ${HEIGHT} --algo ispc"

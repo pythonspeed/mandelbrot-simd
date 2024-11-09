@@ -9,6 +9,7 @@ edition = "2018"
 rayon = "^1.0"
 ispc = { version = "^1.0.4", optional = true }
 structopt = { version = "0.3.0", features = ["color"] }
+wide = "0.7.28"
 
 [build-dependencies]
 ispc = { version = "^1.0.4", optional = true }
