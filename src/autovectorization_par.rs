@@ -1,4 +1,4 @@
-//! Scalar mandelbrot implementation
+//! Scalar mandelbrot implementation that takes advantage of autovectorization.
 
 use crate::*;
 
@@ -10,22 +10,22 @@ struct Complex {
     imag: f64,
 }
 
-const BATCH_SIZE:usize=8;
+const BATCH_SIZE: usize = 8;
 
 /// Returns the number of iterations it takes for the Mandelbrot sequence
 /// to diverge at this point, or `ITER_LIMIT` if it doesn't diverge.
-fn set_count(start: [Complex;BATCH_SIZE], counts:&mut[u32]) {
+fn set_count(start: [Complex; BATCH_SIZE], counts: &mut [u32]) {
     let mut current = start.clone();
-    let mut rr=[0_f64;BATCH_SIZE];
-    let mut ii=[0_f64;BATCH_SIZE];
-    let mut ri=[0_f64;BATCH_SIZE];
+    let mut rr = [0_f64; BATCH_SIZE];
+    let mut ii = [0_f64; BATCH_SIZE];
+    let mut ri = [0_f64; BATCH_SIZE];
     assert_eq!(counts.len(), BATCH_SIZE);
     for i in 0..BATCH_SIZE {
-        counts[i]=ITER_LIMIT;
+        counts[i] = ITER_LIMIT;
     }
     for iteration in 0..ITER_LIMIT {
         for i in 0..BATCH_SIZE {
-            if counts[i]==ITER_LIMIT {
+            if counts[i] == ITER_LIMIT {
                 rr[i] = current[i].real * current[i].real;
                 ii[i] = current[i].imag * current[i].imag;
                 if rr[i] + ii[i] > THRESHOLD {
@@ -38,7 +38,6 @@ fn set_count(start: [Complex;BATCH_SIZE], counts:&mut[u32]) {
             }
         }
     }
-
 }
 
 pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
@@ -47,7 +46,7 @@ pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
     let xs = {
         let dx = (xr.end - xr.start) / (width as f64);
 
-        let mut buf:Vec<f64> = Vec::new();
+        let mut buf: Vec<f64> = Vec::new();
 
         (0..width)
             .into_par_iter()
@@ -65,17 +64,21 @@ pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
         out.set_len(len);
     }
 
-
     out.par_chunks_mut(width).enumerate().for_each(|(i, row)| {
         let y = yr.start + dy * (i as f64);
-        let mut zs=[Complex{real:0_f64,imag:0_f64};BATCH_SIZE];
-        row.chunks_exact_mut(BATCH_SIZE).enumerate().for_each(|(j, count)| {
-            for i in 0..BATCH_SIZE {
-                zs[i].real=xs[j*BATCH_SIZE+i];
-                zs[i].imag=y;
-            }
-            set_count(zs,count);
-        });
+        let mut zs = [Complex {
+            real: 0_f64,
+            imag: 0_f64,
+        }; BATCH_SIZE];
+        row.chunks_exact_mut(BATCH_SIZE)
+            .enumerate()
+            .for_each(|(j, count)| {
+                for i in 0..BATCH_SIZE {
+                    zs[i].real = xs[j * BATCH_SIZE + i];
+                    zs[i].imag = y;
+                }
+                set_count(zs, count);
+            });
     });
 
     out
