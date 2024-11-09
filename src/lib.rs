@@ -211,6 +211,11 @@ mod tests {
         let simd =
             simd_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
         verify(&simd[..], &scalar[..]);
+
+        eprintln!("Generating Mandelbrot with autovectorized algorithm");
+        let simd =
+            autovectorization_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
+        verify(&simd[..], &scalar[..]);
     }
 
     fn verify_algo(algo: Algorithm) {
