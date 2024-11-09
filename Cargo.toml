@@ -23,6 +23,3 @@ path = "src/lib.rs"
 
 [features]
 default = []
-
-[dev-dependencies]
-criterion = { version = "0.5", features = ["html_reports", "real_blackbox", "cargo_bench_support"] }

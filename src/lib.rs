@@ -23,7 +23,6 @@ mod scalar_par;
 mod simd_par;
 
 mod autovectorization_par;
-mod autovectorization_ser;
 
 type Range = ops::Range<f64>;
 type Region = (Range, Range);
