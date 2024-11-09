@@ -1,10 +1,12 @@
 # Mandelbrot
 
-This repository includes multiple implementations of the Mandelbrot algorithm in Rust:
+This repository includes multiple implementations of the Mandelbrot algorithm in Rust, showing how parallelism and SIMD can be used to speed it up:
 
 * **Scalar:** The standard algorithm, one value at a time.
 * **Portable SIMD / `std::simd`**: Uses the as-yet unstable built-in portable SIMD support in Rust.
 * **Scalar with autovectorization:** A scalar version written so the compiler can autovectorize it, i.e. decide to use SIMD automatically.
+
+All implementations use parallelism out of the box, using Rayon.
 
 ## History
 
