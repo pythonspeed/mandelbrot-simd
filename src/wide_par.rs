@@ -9,8 +9,7 @@ use wide::*;
 // SIMD types, they'll get processed as a batch if the CPU supports it, using
 // special SIMD "registers" (CPU storage slots), which can be 128-bit, 256-bit,
 // or 512-bit.
-type u64s = u64x4;
-type u32s = u32x4;
+type i64s = i64x4;
 type f64s = f64x4;
 
 /// Storage for complex numbers in SIMD format. The real and imaginary parts are
@@ -23,7 +22,7 @@ struct Complex {
 
 /// Returns the number of iterations it takes for the Mandelbrot sequence
 /// to diverge at this point, or `ITER_LIMIT` if it doesn't diverge.
-fn get_count(start: &Complex) -> u32s {
+fn get_count(start: &Complex) -> i64s {
     // Instead of getting a single value as input, we get a batch of 4.
     let mut current = start.clone();
     // Instead of having a single return value, we are going to return a batch
@@ -45,10 +44,10 @@ fn get_count(start: &Complex) -> u32s {
         //
         // For example:
         //
-        // [2.3, 4.2, 4.0, 4.1, 0.5, 0.7, 2.3, 5.0]
-        //                 simd_le
-        // [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
-        //                    ↓
+        // [2.3, 4.2, 4.0, 4.1]
+        //        cmp_le
+        // [4.0, 4.0, 4.0, 4.0]
+        //           ↓
         // [  1,   0,   1,   0,   1,   1,   1,   0]
         let undiverged_mask = (rr + ii).cmp_le(threshold_mask);
 
@@ -67,11 +66,7 @@ fn get_count(start: &Complex) -> u32s {
         current.real = start.real + (rr - ii);
         current.imag = start.imag + (ri + ri);
     }
-    let mut result = [0u32; 4];
-    for (i, value) in count.to_array().into_iter().enumerate() {
-        result[i] = *value as u32;
-    }
-    u32s::from(result)
+    count.round_int()
 }
 
 pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
@@ -107,7 +102,7 @@ pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
     let dy = (yr.end - yr.start) / (height as f64);
 
     let len = width_in_blocks * height;
-    let mut out = Vec::with_capacity(len);
+    let mut out : Vec<[u32; 4]>= Vec::with_capacity(len);
     unsafe {
         out.set_len(len);
     }
@@ -119,7 +114,10 @@ pub fn generate(dims: Dimensions, xr: Range, yr: Range) -> Vec<u32> {
             row.iter_mut().enumerate().for_each(|(j, count)| {
                 let x = xs[j];
                 let z = Complex { real: x, imag: y };
-                *count = get_count(&z);
+                let result = get_count(&z).to_array();
+                for k in 0..4 {
+                    count[k] = result[k] as u32;
+                }
             });
         });
 
