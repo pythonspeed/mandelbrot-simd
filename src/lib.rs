@@ -17,12 +17,12 @@ use std::{io, ops};
 // Returns a vector of dimensions `width * height`, where each byte is
 // the number of iterations the corresponding point reached before diverging.
 
+mod autovectorization_par;
 #[cfg(feature = "ispc")]
 mod ispc_tasks;
 mod scalar_par;
 mod simd_par;
 mod wide_par;
-mod autovectorization_par;
 
 type Range = ops::Range<f64>;
 type Region = (Range, Range);
@@ -58,31 +58,27 @@ impl Mandelbrot {
 
     /// Generates a new image containing a certain region of the Mandelbrot
     /// fractal.
-    pub fn generate_region(
-        dims: Dimensions, region: Region, algo: Algorithm,
-    ) -> Self {
+    pub fn generate_region(dims: Dimensions, region: Region, algo: Algorithm) -> Self {
         let data = match algo {
-            Algorithm::Scalar => {
-                scalar_par::generate(dims, region.0, region.1)
-            }
+            Algorithm::Scalar => scalar_par::generate(dims, region.0, region.1),
             Algorithm::Simd => simd_par::generate(dims, region.0, region.1),
-            Algorithm::AutoVectorization => autovectorization_par::generate(dims, region.0, region.1),
+            Algorithm::AutoVectorization => {
+                autovectorization_par::generate(dims, region.0, region.1)
+            }
             Algorithm::Wide => wide_par::generate(dims, region.0, region.1),
             #[cfg(feature = "ispc")]
             Algorithm::Ispc => ispc_tasks::generate(dims, region.0, region.1),
             #[cfg(not(feature = "ispc"))]
-            Algorithm::Ispc => unimplemented!(
-                "This crate was built with the `ispc` feature disabled"
-            ),
+            Algorithm::Ispc => {
+                unimplemented!("This crate was built with the `ispc` feature disabled")
+            }
         };
 
         Self { dims, data }
     }
 
     /// Writes the PBM / PPM header to the output.
-    fn write_header(
-        &self, f: &mut dyn io::Write, color: bool,
-    ) -> io::Result<()> {
+    fn write_header(&self, f: &mut dyn io::Write, color: bool) -> io::Result<()> {
         writeln!(f, "P{}", if color { 6 } else { 4 })?;
         write!(f, "{} {}", self.dims.0, self.dims.1)?;
         if color {
@@ -206,18 +202,19 @@ mod tests {
         };
 
         eprintln!("Generating Mandelbrot with scalar algorithm");
-        let scalar =
-            scalar_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
+        let scalar = scalar_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
         assert_eq!(scalar.len(), width * height);
 
         eprintln!("Generating Mandelbrot with SIMD algorithm");
-        let simd =
-            simd_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
+        let simd = simd_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
         verify(&simd[..], &scalar[..]);
 
         eprintln!("Generating Mandelbrot with autovectorized algorithm");
-        let simd =
-            autovectorization_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
+        let simd = autovectorization_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
+        verify(&simd[..], &scalar[..]);
+
+        eprintln!("Generating Mandelbrot with autovectorized algorithm");
+        let simd = wide_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
         verify(&simd[..], &scalar[..]);
     }
 
@@ -238,15 +235,16 @@ mod tests {
         assert_eq!(out.len(), OUTPUT.len());
 
         if out != OUTPUT {
-            out.into_iter().zip(OUTPUT.iter()).enumerate().for_each(
-                |(i, (a, &b))| {
+            out.into_iter()
+                .zip(OUTPUT.iter())
+                .enumerate()
+                .for_each(|(i, (a, &b))| {
                     assert_eq!(
                         a, b,
                         "byte {} differs - {:#08b} != {:#08b} (expected)",
                         i, a, b,
                     );
-                },
-            );
+                });
         }
     }
 
