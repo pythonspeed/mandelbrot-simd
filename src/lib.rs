@@ -23,6 +23,7 @@ mod ispc_tasks;
 mod scalar_par;
 mod simd_par;
 mod wide_par;
+mod pulp_par;
 
 type Range = ops::Range<f64>;
 type Region = (Range, Range);
@@ -66,6 +67,7 @@ impl Mandelbrot {
                 autovectorization_par::generate(dims, region.0, region.1)
             }
             Algorithm::Wide => wide_par::generate(dims, region.0, region.1),
+            Algorithm::Wide => pulp_par::generate(dims, region.0, region.1),
             #[cfg(feature = "ispc")]
             Algorithm::Ispc => ispc_tasks::generate(dims, region.0, region.1),
             #[cfg(not(feature = "ispc"))]
@@ -213,9 +215,14 @@ mod tests {
         let simd = autovectorization_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
         verify(&simd[..], &scalar[..]);
 
-        eprintln!("Generating Mandelbrot with autovectorized algorithm");
+        eprintln!("Generating Mandelbrot with wide algorithm");
         let simd = wide_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
         verify(&simd[..], &scalar[..]);
+
+        eprintln!("Generating Mandelbrot with pulp algorithm");
+        let simd = pulp_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
+        verify(&simd[..], &scalar[..]);
+
     }
 
     fn verify_algo(algo: Algorithm) {
