@@ -4,7 +4,7 @@ This repository includes multiple implementations of the Mandelbrot algorithm in
 
 From fastest to slowest:
 
-* **Portable SIMD / `std::simd`**: Uses the built-in portable SIMD support in Rust, requires unstable compiler.
+* **`std::simd`**: Uses the built-in portable SIMD support in Rust, requires unstable compiler.
 * **`pulp` SIMD:** Use the [`pulp`](https://docs.rs/pulp/) crate to implement portable SIMD operations. **`pulp` can use the stable compiler.**
 * **`wide` SIMD**: Use the [`wide`](https://docs.rs/wide/) crate to implement portable SIMD operations. **`wide` can use the stable compiler.**
 * **Scalar with autovectorization:** A scalar version written so the compiler can autovectorize it, i.e. decide to use SIMD automatically.
