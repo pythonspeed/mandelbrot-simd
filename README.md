@@ -1,11 +1,14 @@
 # Mandelbrot
 
-This repository includes multiple implementations of the Mandelbrot algorithm in Rust, showing how parallelism and SIMD can be used to speed it up:
+This repository includes multiple implementations of the Mandelbrot algorithm in Rust, showing how parallelism and SIMD can be used to speed it up.
 
-* **Scalar:** The standard algorithm, one value at a time.
+From fastest to slowest:
+
 * **Portable SIMD / `std::simd`**: Uses the built-in portable SIMD support in Rust, requires unstable compiler.
+* **`pulp` SIMD:** Use the [`pulp`](https://docs.rs/pulp/) crate to implement portable SIMD operations. **`pulp` can use the stable compiler.**
+* **`wide` SIMD**: Use the [`wide`](https://docs.rs/wide/) crate to implement portable SIMD operations. **`wide` can use the stable compiler.**
 * **Scalar with autovectorization:** A scalar version written so the compiler can autovectorize it, i.e. decide to use SIMD automatically.
-* **`wide` SIMD**: Use the `wide` crate to implement portable SIMD operations. Can use stable compiler.
+* **Scalar:** The standard algorithm, one value at a time.
 
 All implementations use parallelism out of the box, using Rayon.
 
@@ -18,6 +21,7 @@ Changes from the original implementation:
 * Updated to use the newer [Rust portable SIMD API](https://doc.rust-lang.org/std/simd/index.html) (nightly only at the moment).
 * Simplified the calculation logic so it's easier to understand.
 * Autovectorized implementation contributed by [https://github.com/giovannicuccu](`giovannicuccu`).
+* `pulp` implementation contributed by [sarah quiñones](https://github.com/sarah-quinones).
 
 Licensed under MIT or Apache 2.0, at your choice, copyrighted by the Rust Project Developers, with minor changes by Itamar Turner-Trauring.
 
