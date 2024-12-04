@@ -10,6 +10,8 @@ rayon = "^1.0"
 ispc = { version = "^1.0.4", optional = true }
 structopt = { version = "0.3.0", features = ["color"] }
 wide = "0.7.28"
+pulp = { version = "0.20.1", features = ["nightly"] }
+bytemuck = "1.20.0"
 
 [build-dependencies]
 ispc = { version = "^1.0.4", optional = true }
