@@ -20,6 +20,7 @@ use std::{io, ops};
 mod autovectorization_par;
 #[cfg(feature = "ispc")]
 mod ispc_tasks;
+mod pulp_par;
 mod scalar_par;
 mod simd_par;
 mod wide_par;
@@ -43,6 +44,8 @@ pub enum Algorithm {
     Wide,
     /// ISPC SIMD + parallel tasks algorithm
     Ispc,
+    /// Parallel SIMD algorithm using Rayon and pulp crate
+    Pulp,
 }
 
 pub struct Mandelbrot {
@@ -66,6 +69,7 @@ impl Mandelbrot {
                 autovectorization_par::generate(dims, region.0, region.1)
             }
             Algorithm::Wide => wide_par::generate(dims, region.0, region.1),
+            Algorithm::Pulp => pulp_par::generate(dims, region.0, region.1),
             #[cfg(feature = "ispc")]
             Algorithm::Ispc => ispc_tasks::generate(dims, region.0, region.1),
             #[cfg(not(feature = "ispc"))]
@@ -213,8 +217,12 @@ mod tests {
         let simd = autovectorization_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
         verify(&simd[..], &scalar[..]);
 
-        eprintln!("Generating Mandelbrot with autovectorized algorithm");
+        eprintln!("Generating Mandelbrot with wide algorithm");
         let simd = wide_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
+        verify(&simd[..], &scalar[..]);
+
+        eprintln!("Generating Mandelbrot with pulp algorithm");
+        let simd = pulp_par::generate(dims, DEFAULT_REGION.0, DEFAULT_REGION.1);
         verify(&simd[..], &scalar[..]);
     }
 
@@ -251,6 +259,11 @@ mod tests {
     #[test]
     fn verify_output_scalar() {
         verify_algo(Algorithm::Scalar);
+    }
+
+    #[test]
+    fn verify_output_all() {
+        verify_all();
     }
 
     #[test]
