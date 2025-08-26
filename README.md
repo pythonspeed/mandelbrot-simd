@@ -2,7 +2,7 @@
 
 This repository includes multiple implementations of the Mandelbrot algorithm in Rust, showing how parallelism and SIMD can be used to speed it up.
 
-From fastest to slowest:
+From fastest to slowest (keeping in mind this doesn't mean this will be the ordering for _your_ problem, and the order may be different on different hardware):
 
 * **`std::simd`**: Uses the built-in portable SIMD support in Rust, requires unstable compiler.
 * **`pulp` SIMD:** Use the [`pulp`](https://docs.rs/pulp/) crate to implement portable SIMD operations. **`pulp` can use the stable compiler.**
